@@ -126,8 +126,8 @@
                                 <tr>
                                     <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-italic text-gray-800">${transaction.id}</span></td>
                                     <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold text-gray-900">${transaction.product.name}</span></td>
-                                    <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaction.quantity}</span></td>
                                     <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold text-blue-700">${transaction.total_price}</span></td>
+                                    <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaction.quantity}</span></td>
                                     <td class="px-5 py-5 border-b border-gray-200 text-sm">
                                         <button data-id="${transaction.id}" class="edit-btn bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-2">Edit</button>
                                         <button data-id="${transaction.id}" class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
