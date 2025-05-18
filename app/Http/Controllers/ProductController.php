@@ -19,17 +19,17 @@ class ProductController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $userId) {
-            return response()->json(['message' => 'Forbidden - Not your products', 'redirect_url' => '/products/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your products'], 403);
         }
 
         $products = Product::where('user_id', $userId)->get();
@@ -47,17 +47,17 @@ class ProductController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $userId) {
-            return response()->json(['message' => 'Forbidden - Cannot create products for other users', 'redirect_url' => '/products/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Cannot create products for other users'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -91,17 +91,17 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $product->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your product', 'redirect_url' => '/products/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your product'], 403);
         }
         return response()->json($product, 200);
     }
@@ -118,12 +118,12 @@ class ProductController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
@@ -132,7 +132,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         if ($loggedInUser->id != $product->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your product', 'redirect_url' => '/products/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your product'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -164,18 +164,18 @@ class ProductController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         $product = Product::findOrFail($id);
         if ($loggedInUser->id != $product->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your product', 'redirect_url' => '/products/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your product'], 403);
         }
 
         $product->delete();

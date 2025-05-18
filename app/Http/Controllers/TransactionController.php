@@ -19,17 +19,17 @@ class TransactionController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $userId) {
-            return response()->json(['message' => 'Forbidden - Not your transactions', 'redirect_url' => '/transactions/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your transactions'], 403);
         }
 
         $transactions = Transaction::where('user_id', $userId)->get();
@@ -47,17 +47,17 @@ class TransactionController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $userId) {
-            return response()->json(['message' => 'Forbidden - Cannot create transactions for other users', 'redirect_url' => '/transactions/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Cannot create transactions for other users'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -93,17 +93,17 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($id);
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $transaction->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your transaction', 'redirect_url' => '/transactions/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your transaction'], 403);
         }
         return response()->json($transaction, 200);
     }
@@ -120,18 +120,18 @@ class TransactionController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         $transaction = Transaction::findOrFail($id);
         if ($loggedInUser->id != $transaction->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your transaction', 'redirect_url' => '/transactions/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your transaction'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -164,18 +164,18 @@ class TransactionController extends Controller
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
-            return response()->json(['message' => 'Unauthorized - Not logged in', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
         }
         $accessToken = PersonalAccessToken::findToken($tokenValue);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return response()->json(['message' => 'Unauthorized - Invalid token', 'redirect_url' => '/login'], 401);
+            return response()->json(['message' => 'Unauthorized - Invalid token'], 401);
         }
 
         $loggedInUser = $accessToken->tokenable;
         $transaction = Transaction::findOrFail($id);
         if ($loggedInUser->id != $transaction->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your transaction', 'redirect_url' => '/transactions/' . $loggedInUser->id], 403);
+            return response()->json(['message' => 'Forbidden - Not your transaction'], 403);
         }
 
         $transaction->delete();
