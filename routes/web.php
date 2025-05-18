@@ -2,14 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function() { 
-    return redirect('/products');
+Route::get('/', function () {
+    return view('home');
 });
-
-Route::get('/transactions', function () {
-    return view('transactions');
+Route::get('/login', function () {
+    return view('login');
 });
-
-Route::get('/products', function () {
+Route::get('/signup', function () {
+    return view('signup');
+});
+Route::get('/products/{user_id}', function ($user_id) {
     return view('products');
+});
+Route::get('/transactions/{user_id}', function ($user_id) {
+    return view('transactions');
 });
