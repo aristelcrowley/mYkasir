@@ -3,36 +3,34 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use App\Models\Product; 
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Transaction;
 
 class TransactionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-        $firstProduct = DB::table('products')->first();
-        $secondProduct = DB::table('products')->skip(1)->first();
+        $products = Product::all();
+        $users = User::all();
 
-        if ($firstProduct) {
-            DB::table('transactions')->insert([
-                'product_id' => $firstProduct->id,
-                'quantity' => 2,
-                'total_price' => $firstProduct->price * 2,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        if ($products->count() === 0 || $users->count() === 0) {
+            $this->command->error('No products or users found. Please run the ProductSeeder and UserSeeder first.');
+            return;
         }
 
-        if ($secondProduct) {
-            DB::table('transactions')->insert([
-                'product_id' => $secondProduct->id,
+        $firstUser = $users->first();
+        foreach ($products as $product) {
+            Transaction::create([
+                'product_id' => $product->id,
+                'user_id' => $firstUser->id,
                 'quantity' => 1,
-                'total_price' => $secondProduct->price,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'total_price' => $product->price,
             ]);
         }
     }
