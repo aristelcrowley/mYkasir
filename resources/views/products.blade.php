@@ -46,7 +46,7 @@
                         <div class="p-6 border-b border-gray-200">
                             <div class="flex justify-between items-center">
                                 <h2 class="text-xl font-semibold text-gray-800">Add New Product</h2>
-                                <span class="close text-gray-400 hover:text-gray-600 cursor-pointer">
+                                <span class="close-add-modal text-gray-400 hover:text-gray-600 cursor-pointer">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -55,21 +55,23 @@
                         </div>
                         <form id="addProductForm" class="p-6">
                             <div class="mb-4">
-                                <label for="name" class="block text-gray-700 text-sm font-medium mb-2">Name:</label>
-                                <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <div id="name-error" class="text-red-500 text-xs mt-1" style="display: none;"></div>
+                                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                                <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <p id="name-error" class="text-red-500 text-xs italic hidden"></p>
                             </div>
                             <div class="mb-4">
-                                <label for="price" class="block text-gray-700 text-sm font-medium mb-2">Price:</label>
-                                <input type="number" id="price" name="price" min="0" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <div id="price-error" class="text-red-500 text-xs mt-1" style="display: none;"></div>
+                                <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Price</label>
+                                <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <p id="price-error" class="text-red-500 text-xs italic hidden"></p>
                             </div>
-                            <div class="mb-6">
-                                <label for="stock" class="block text-gray-700 text-sm font-medium mb-2">Stock:</label>
-                                <input type="number" id="stock" name="stock" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <div id="stock-error" class="text-red-500 text-xs mt-1" style="display: none;"></div>
+                            <div class="mb-4">
+                                <label for="stock" class="block text-gray-700 text-sm font-bold mb-2">Stock</label>
+                                <input type="number" id="stock" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <p id="stock-error" class="text-red-500 text-xs italic hidden"></p>
                             </div>
-                            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2.5 px-4 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Add Product</button>
+                            <div class="flex items-center justify-end">
+                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Product</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -81,7 +83,7 @@
                         <div class="p-6 border-b border-gray-200">
                             <div class="flex justify-between items-center">
                                 <h2 class="text-xl font-semibold text-gray-800">Edit Product</h2>
-                                <span class="close text-gray-400 hover:text-gray-600 cursor-pointer">
+                                <span class="close-edit-modal text-gray-400 hover:text-gray-600 cursor-pointer">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -89,27 +91,30 @@
                             </div>
                         </div>
                         <form id="editProductForm" class="p-6">
+                            <input type="hidden" id="edit_id">
                             <div class="mb-4">
-                                <label for="edit_name" class="block text-gray-700 text-sm font-medium mb-2">Name:</label>
-                                <input type="text" id="edit_name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <div id="edit-name-error" class="text-red-500 text-xs mt-1" style="display: none;"></div>
+                                <label for="edit_name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                                <input type="text" id="edit_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <p id="edit-name-error" class="text-red-500 text-xs italic hidden"></p>
                             </div>
                             <div class="mb-4">
-                                <label for="edit_price" class="block text-gray-700 text-sm font-medium mb-2">Price:</label>
-                                <input type="number" id="edit_price" name="price" min="0" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <div id="edit-price-error" class="text-red-500 text-xs mt-1" style="display: none;"></div>
+                                <label for="edit_price" class="block text-gray-700 text-sm font-bold mb-2">Price</label>
+                                <input type="number" id="edit_price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <p id="edit-price-error" class="text-red-500 text-xs italic hidden"></p>
                             </div>
-                            <div class="mb-6">
-                                <label for="edit_stock" class="block text-gray-700 text-sm font-medium mb-2">Stock:</label>
-                                <input type="number" id="edit_stock" name="stock" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <div id="edit-stock-error" class="text-red-500 text-xs mt-1" style="display: none;"></div>
+                            <div class="mb-4">
+                                <label for="edit_stock" class="block text-gray-700 text-sm font-bold mb-2">Stock</label>
+                                <input type="number" id="edit_stock" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <p id="edit-stock-error" class="text-red-500 text-xs italic hidden"></p>
                             </div>
-                            <input type="hidden" id="edit_id" name="id">
-                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2.5 px-4 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Update Product</button>
+                            <div class="flex items-center justify-end">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Update Product</button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
+
 
             <div id="errorModal" class="fixed z-10 inset-0 overflow-y-auto bg-black/50 backdrop-blur-md hidden modal">
                 <div class="flex items-center justify-center min-h-screen p-4">
@@ -186,8 +191,9 @@
     </div>
 
     <script>
-    $(document).ready(function() {
+$(document).ready(function() {
         const userId = window.location.pathname.split('/').pop(); // Extract user ID from URL
+        console.log("User ID:", userId); // Check the extracted user ID
 
         // Function to perform AJAX requests with the// auth_token cookie
         function ajaxRequest(url, type, data = null) {
@@ -204,7 +210,7 @@
 
         // Fetch and display products
         function fetchProducts() {
-            ajaxRequest(`/api/products/${userId}`, 'GET')
+            ajaxRequest(`/api/products`, 'GET')
                 .done(function(products) {
                     let tableBody = $('#productsTable').find('tbody');
                     tableBody.empty(); // Clear loading message and any existing data
@@ -240,9 +246,10 @@
             $('#addProductModal').show();
         });
 
-        $('#addProductModal .close').click(function() {
+        // Add Product Modal Close
+        $('#addProductModal .close-add-modal').click(function() {
             $('#addProductModal').hide();
-            $('#addProductForm')[0].reset(); //reset form
+            $('#addProductForm')[0].reset();
             $('.error-message').hide();
         });
 
@@ -279,7 +286,7 @@
                 return;
             }
 
-            ajaxRequest(`/api/products/${userId}`, 'POST', { name: name, price: price, stock: stock })
+            ajaxRequest(`/api/products`, 'POST', { user_id: userId, name: name, price: price, stock: stock })
                 .done(function(response) {
                     $('#addProductModal').hide();
                     $('#addProductForm')[0].reset();
@@ -298,7 +305,7 @@
                         });
                         showErrorModal(errorMessage);
                     }
-                     else {
+                    else {
                         showErrorModal('Error adding product: ' + error);
                     }
                 });
@@ -306,8 +313,8 @@
 
         // Edit Product
         $(document).on('click', '.edit-btn', function() {
-            let id = $(this).data('id');
-            ajaxRequest(`/api/products/${userId}/${id}`, 'GET')
+            let productId = $(this).data('id');
+            ajaxRequest(`/api/products/${productId}`, 'GET')
                 .done(function(product) {
                     $('#edit_id').val(product.id);
                     $('#edit_name').val(product.name);
@@ -317,7 +324,7 @@
                 })
                 .fail(function(xhr, status, error) {
                     if (xhr.status === 401) {
-                        window.location.href = '/login'; // Redirect to login on unauthorized
+                        window.location.href = '/login';
                     } else if (xhr.status === 403) {
                         showErrorModal('Forbidden - You do not have permission to edit this product.');
                     } else {
@@ -326,7 +333,8 @@
                 });
         });
 
-        $('#editProductModal .close').click(function() {
+        // Edit Product Modal Close
+        $('#editProductModal .close-edit-modal').click(function() {
             $('#editProductModal').hide();
             $('#editProductForm')[0].reset();
             $('.error-message').hide();
@@ -335,13 +343,13 @@
         $('#editProductForm').submit(function(event) {
             event.preventDefault();
 
-            let id = $('#edit_id').val();
+            let productId = $('#edit_id').val();
             let name = $('#edit_name').val();
             let price = $('#edit_price').val();
             let stock = $('#edit_stock').val();
             let hasErrors = false;
 
-            $('.error-message').hide(); // Clear previous errors
+            $('.error-message').hide();
 
             if (name.trim() === '') {
                 $('#edit-name-error').text('Name is required').show();
@@ -351,14 +359,14 @@
                 $('#edit-price-error').text('Price is required').show();
                 hasErrors = true;
             } else if (isNaN(price) || parseFloat(price) < 0) {
-                $('#edit-price-error').text('Price must be a number greater than or equal to 0').show();
+                $('#edit-price-error').text('Price must be a number >= 0').show();
                 hasErrors = true;
             }
             if (stock === '') {
-                $('#edit-stock-error').text('Stock isrequired').show();
+                $('#edit-stock-error').text('Stock is required').show();
                 hasErrors = true;
             } else if (isNaN(stock) || parseInt(stock) < 0) {
-                $('#edit-stock-error').text('Stock must be an integer greater than or equal to 0').show();
+                $('#edit-stock-error').text('Stock must be an integer >= 0').show();
                 hasErrors = true;
             }
 
@@ -366,7 +374,7 @@
                 return;
             }
 
-            ajaxRequest(`/api/products/${userId}/${id}`, 'PUT', { name: name, price: price, stock: stock })
+            ajaxRequest(`/api/products/${productId}`, 'PUT', { name: name, price: price, stock: stock })
                 .done(function(response) {
                     $('#editProductModal').hide();
                     $('#editProductForm')[0].reset();
@@ -375,7 +383,7 @@
                 })
                 .fail(function(xhr, status, error) {
                     if (xhr.status === 401) {
-                        window.location.href = '/login'; // Redirect to login on unauthorized
+                        window.location.href = '/login'; 
                     } else if (xhr.status === 403) {
                         showErrorModal('Forbidden - You do not have permission to edit this product.');
                     } else if (xhr.status === 422) {
@@ -394,16 +402,16 @@
 
         // Delete Product
         $(document).on('click', '.delete-btn', function() {
-            let id = $(this).data('id');
+            let productId = $(this).data('id');
             if (confirm('Are you sure you want to delete this product?')) {
-                ajaxRequest(`/api/products/${userId}/${id}`, 'DELETE')
+                ajaxRequest(`/api/products/${productId}`, 'DELETE')
                     .done(function(response) {
                         fetchProducts();
                         showSuccessModal('Product deleted successfully!');
                     })
                     .fail(function(xhr, status, error) {
                         if (xhr.status === 401) {
-                            window.location.href = '/login'; // Redirect to login on unauthorized
+                            window.location.href = '/login'; 
                         } else if (xhr.status === 403) {
                             showErrorModal('Forbidden - You do not have permission to delete this product.');
                         } else {
@@ -430,9 +438,23 @@
             $(this).closest('.modal').hide();
         });
 
+        // Close modals by clicking outside
         $(window).click(function(event) {
-            if ($(event.target).hasClass('modal')) {
-                $('.modal').hide();
+            if ($(event.target).is('#addProductModal')) {
+                $('#addProductModal').hide();
+                $('#addProductForm')[0].reset();
+                $('.error-message').hide();
+            }
+            if ($(event.target).is('#editProductModal')) {
+                $('#editProductModal').hide();
+                $('#editProductForm')[0].reset();
+                $('.error-message').hide();
+            }
+            if ($(event.target).is('#errorModal')) {
+                $('#errorModal').hide();
+            }
+            if ($(event.target).is('#successModal')) {
+                $('#successModal').hide();
             }
         });
 

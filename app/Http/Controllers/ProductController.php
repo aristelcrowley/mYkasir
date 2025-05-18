@@ -15,7 +15,7 @@ class ProductController extends Controller
      * @param  int  $userId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index($userId)
+    public function index(Request $request)
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
@@ -28,11 +28,11 @@ class ProductController extends Controller
         }
 
         $loggedInUser = $accessToken->tokenable;
-        if ($loggedInUser->id != $userId) {
-            return response()->json(['message' => 'Forbidden - Not your products'], 403);
-        }
+        if ($loggedInUser->id != $request->user()->id) {
+        return response()->json(['message' => 'Forbidden - Not your product'], 403);
+    }
 
-        $products = Product::where('user_id', $userId)->get();
+        $products = Product::where('user_id', $request->user()->id)->get();
         return response()->json($products, 200);
     }
 
@@ -40,10 +40,9 @@ class ProductController extends Controller
      * Store a newly created product for the user.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $userId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $userId)
+    public function store(Request $request)
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
@@ -56,25 +55,27 @@ class ProductController extends Controller
         }
 
         $loggedInUser = $accessToken->tokenable;
-        if ($loggedInUser->id != $userId) {
-            return response()->json(['message' => 'Forbidden - Cannot create products for other users'], 403);
-        }
 
         $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,id', // Expecting user_id in the request
             'name' => 'required|string|max:255',
-            'description' => 'required|string',
             'price' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:0', // Added stock validation here as well
         ]);
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation error', 'errors' => $validator->errors()], 422);
         }
 
+        if ($loggedInUser->id != $request->input('user_id')) {
+            return response()->json(['message' => 'Forbidden - Cannot create products for other users'], 403);
+        }
+
         $product = new Product();
-        $product->user_id = $userId;
+        $product->user_id = $request->input('user_id');
         $product->name = $request->input('name');
-        $product->description = $request->input('description');
         $product->price = $request->input('price');
+        $product->stock = $request->input('stock', 0); // Default stock to 0 if not provided
         $product->save();
 
         return response()->json($product, 201);
@@ -83,12 +84,12 @@ class ProductController extends Controller
     /**
      * Display the specified product.
      *
-     * @param  int  $id
+     * @param  int  $productId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show($productId)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($productId);
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
             return response()->json(['message' => 'Unauthorized - Not logged in'], 401);
@@ -101,8 +102,10 @@ class ProductController extends Controller
 
         $loggedInUser = $accessToken->tokenable;
         if ($loggedInUser->id != $product->user_id) {
-            return response()->json(['message' => 'Forbidden - Not your product'], 403);
-        }
+        return response()->json([
+            'message' => "Forbidden - Not your product. Logged-in User ID: {$loggedInUser->id}, Product ID: {$product->id}, Product User ID: {$product->user_id}",
+        ], 403);
+    }
         return response()->json($product, 200);
     }
 
@@ -110,11 +113,10 @@ class ProductController extends Controller
      * Update the specified product for the user.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $userId
-     * @param  int  $id
+     * @param  int  $productId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $userId, $id)
+    public function update(Request $request, $productId)
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
@@ -127,9 +129,7 @@ class ProductController extends Controller
         }
 
         $loggedInUser = $accessToken->tokenable;
-
-
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($productId);
 
         if ($loggedInUser->id != $product->user_id) {
             return response()->json(['message' => 'Forbidden - Not your product'], 403);
@@ -137,8 +137,8 @@ class ProductController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
-            'description' => 'string',
             'price' => 'numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -146,8 +146,8 @@ class ProductController extends Controller
         }
 
         $product->name = $request->input('name', $product->name);
-        $product->description = $request->input('description', $product->description);
         $product->price = $request->input('price', $product->price);
+        $product->stock = $request->input('stock', $product->stock);
         $product->save();
 
         return response()->json($product, 200);
@@ -156,11 +156,10 @@ class ProductController extends Controller
     /**
      * Remove the specified product for the user.
      *
-     * @param  int  $userId
-     * @param  int  $id
+     * @param  int  $productId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($userId, $id)
+    public function destroy($productId)
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
@@ -173,7 +172,7 @@ class ProductController extends Controller
         }
 
         $loggedInUser = $accessToken->tokenable;
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($productId);
         if ($loggedInUser->id != $product->user_id) {
             return response()->json(['message' => 'Forbidden - Not your product'], 403);
         }

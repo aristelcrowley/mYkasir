@@ -26,7 +26,6 @@ class ProductSeeder extends Seeder
 
         Product::create([
             'name' => "Laptop",
-            'description' => "High-performance laptop",
             'price' => 12000000,
             'stock' => 10,
             'user_id' => $firstUser->id,
@@ -34,7 +33,6 @@ class ProductSeeder extends Seeder
 
         Product::create([
             'name' => "Mouse",
-            'description' => "Wireless mouse",
             'price' => 300000,
             'stock' => 50,
             'user_id' => $firstUser->id,
@@ -42,7 +40,6 @@ class ProductSeeder extends Seeder
 
         Product::create([
             'name' => "Keyboard",
-            'description' => "Gaming keyboard",
             'price' => 800000,
             'stock' => 30,
             'user_id' => $firstUser->id,

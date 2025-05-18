@@ -11,7 +11,6 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'description',
         'price',
         'stock',
         'user_id', // Add user_id to the fillable array

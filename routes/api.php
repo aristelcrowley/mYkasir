@@ -13,15 +13,15 @@ Route::post('/signup', [RegisterController::class, 'register'])->withoutMiddlewa
 Route::post('/logout', [LoginController::class, 'logout']);
 
 Route::middleware(AuthToken::class)->group(function () {
-    Route::get('/products/{userId}', [ProductController::class, 'index']);
-    Route::post('/products/{userId}', [ProductController::class, 'store']);
-    Route::get('/products/{userId}/{id}', [ProductController::class, 'show']);
-    Route::put('/products/{userId}/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{userId}/{id}', [ProductController::class, 'destroy']);
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/products/{productId}', [ProductController::class, 'show']);
+    Route::put('/products/{productId}', [ProductController::class, 'update']);
+    Route::delete('/products/{productId}', [ProductController::class, 'destroy']);
 
-    Route::get('/transactions/{userId}', [TransactionController::class, 'index']);
-    Route::post('/transactions/{userId}', [TransactionController::class, 'store']);
-    Route::get('/transactions/{userId}/{id}', [TransactionController::class, 'show']);
-    Route::put('/transactions/{userId}/{id}', [TransactionController::class, 'update']);
-    Route::delete('/transactions/{userId}/{id}', [TransactionController::class, 'destroy']);
+    Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::post('/transactions', [TransactionController::class, 'store']);
+    Route::get('/transactions/{transactionId}', [TransactionController::class, 'show']);
+    Route::put('/transactions/{transactionId}', [TransactionController::class, 'update']);
+    Route::delete('/transactions/{transactionId}', [TransactionController::class, 'destroy']);
 });
