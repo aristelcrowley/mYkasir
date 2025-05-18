@@ -6,10 +6,10 @@ Route::get('/', function() {
     return redirect('/products');
 });
 
-Route::get('/transaction', function () {
-    return view('transaction');
+Route::get('/transactions', function () {
+    return view('transactions');
 });
 
-Route::get('/product', function () {
-    return view('product ');
+Route::get('/products', function () {
+    return view('products');
 });
