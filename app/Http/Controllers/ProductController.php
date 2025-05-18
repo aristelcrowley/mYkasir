@@ -15,7 +15,7 @@ class ProductController extends Controller
      * @param  int  $userId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index($userId)
     {
         $tokenValue = request()->cookie('auth_token');
         if (!$tokenValue) {
@@ -28,11 +28,11 @@ class ProductController extends Controller
         }
 
         $loggedInUser = $accessToken->tokenable;
-        if ($loggedInUser->id != $request->user()->id) {
-        return response()->json(['message' => 'Forbidden - Not your product'], 403);
-    }
+        if ($loggedInUser->id != $userId) {
+            return response()->json(['message' => 'Forbidden - Not your producsss'], 403);
+        }
 
-        $products = Product::where('user_id', $request->user()->id)->get();
+        $products = Product::where('user_id', $userId)->get();
         return response()->json($products, 200);
     }
 

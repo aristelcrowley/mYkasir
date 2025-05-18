@@ -218,7 +218,7 @@
 
         // Fetch and display products
         function fetchProducts() {
-            ajaxRequest(`/api/products`, 'GET')
+            ajaxRequest(`/api/products/${userId}`, 'GET')
                 .done(function(products) {
                     let tableBody = $('#productsTable').find('tbody');
                     tableBody.empty(); // Clear loading message and any existing data
@@ -322,7 +322,7 @@
         // Edit Product
         $(document).on('click', '.edit-btn', function() {
             let productId = $(this).data('id');
-            ajaxRequest(`/api/products/${productId}`, 'GET')
+            ajaxRequest(`/api/product/${productId}`, 'GET')
                 .done(function(product) {
                     $('#edit_id').val(product.id);
                     $('#edit_name').val(product.name);

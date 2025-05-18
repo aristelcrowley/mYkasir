@@ -179,14 +179,28 @@
         </div>
     </div>
 
-    <script>
+ <script>
+    const userId = window.location.pathname.split('/').pop(); // Extract user ID from URL
+        
+        const productsNavLink = $('aside a[href="/products"]');
+        if (productsNavLink.length > 0 && userId) { //
+            productsNavLink.attr('href', `/products/${userId}`);
+        }
+
+        const transactionsNavLink = $('aside a[href="/transactions"]');
+        if (transactionsNavLink.length > 0 && userId) { 
+            transactionsNavLink.attr('href', `/transactions/${userId}`);
+        }
+
     $(document).ready(function() {
-        // Fetch and display transactions
         function fetchTransactions() {
             $.ajax({
-                url: '/api/transactions',
+                url: `/api/transactions/${userId}`,
                 type: 'GET',
                 dataType: 'json',
+                xhrFields: {
+                    withCredentials: true // Ensure cookies are sent with the request
+                },
                 success: function(response) {
                     if (response.status === 'success') {
                         let transactions = response.data;
@@ -217,12 +231,14 @@
             });
         }
 
-        // Function to populate the product dropdown during add/edit
         function populateProductDropdown(dropdownId) {
             $.ajax({
                 url: '/api/products-list',
                 type: 'GET',
                 dataType: 'json',
+                xhrFields: {
+                    withCredentials: true // Send cookies with the request
+                },
                 success: function(response) {
                     if (response.status === 'success') {
                         let products = response.data;
@@ -279,12 +295,15 @@
             }
 
             $.ajax({
-                url: '/api/transactions',
+                url: `/api/transactions`, // Include userId in the URL
                 type: 'POST',
                 dataType: 'json',
                 data: {
                     product_id: product_id,
                     quantity: quantity
+                },
+                xhrFields: {
+                    withCredentials: true // Send cookies with the request
                 },
                 success: function(response) {
                     if (response.status === 'success') {
@@ -306,9 +325,12 @@
         $(document).on('click', '.edit-btn', function() {
             let id = $(this).data('id');
             $.ajax({
-                url: '/api/transactions/' + id,
+                url: `/api/transaction/${id}`, // Corrected URL for showing single transaction
                 type: 'GET',
                 dataType: 'json',
+                xhrFields: {
+                    withCredentials: true // Send cookies with the request
+                },
                 success: function(response) {
                     if (response.status === 'success') {
                         let transaction = response.data;
@@ -364,12 +386,15 @@
             }
 
             $.ajax({
-                url: '/api/transactions/' + id,
+                url: `/api/transactions/${id}`, // Include transaction id, you were missing this.
                 type: 'PUT',
                 dataType: 'json',
                 data: {
                     product_id: product_id,
                     quantity: quantity
+                },
+                xhrFields: {
+                    withCredentials: true // Send cookies with the request
                 },
                 success: function(response) {
                     if (response.status === 'success') {
@@ -387,14 +412,18 @@
             });
         });
 
+
         // Delete Transaction
         $(document).on('click', '.delete-btn', function() {
             let id = $(this).data('id');
             if (confirm('Are you sure you want to delete this transaction?')) {
                 $.ajax({
-                    url: '/api/transactions/' + id,
+                    url: `/api/transactions/${id}`, // Include userId and transaction id
                     type: 'DELETE',
                     dataType: 'json',
+                    xhrFields: {
+                        withCredentials: true // Send cookies with the request
+                    },
                     success: function(response) {
                         if (response.status === 'success') {
                             fetchTransactions();
@@ -436,6 +465,6 @@
         // Initial fetch of transactions
         fetchTransactions();
     });
-    </script>
+</script>
 </body>
 </html>
