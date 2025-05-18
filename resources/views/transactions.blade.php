@@ -20,19 +20,25 @@
     </style>
 </head>
 <body class="bg-gray-50 antialiased h-screen flex overflow-hidden">
-    <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200">
-        <div class="p-6">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-8">mYkasir</h2>
-            <nav class="flex flex-col space-y-2">
-                <a href="/products" class="text-gray-600 hover:bg-gray-100 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
-                    <img src="/assets/product.png" alt="Products Icon" class="w-5 h-5 mr-3">
-                    Products
-                </a>
-                <a href="/transactions" class="bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
-                    <img src="/assets/transaction.png" alt="Transactions Icon" class="w-5 h-5 mr-3">
-                    Transactions
-                </a>
-            </nav>
+    <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col h-screen">
+        <div class="p-6 flex flex-col justify-between h-full">
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-8">mYkasir</h2>
+                <nav class="flex flex-col space-y-2">
+                    <a href="/products" class="text-gray-600 hover:bg-gray-100 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
+                        <img src="/assets/product.png" alt="Products Icon" class="w-5 h-5 mr-3">
+                        Products
+                    </a>
+                    <a href="/transactions" class="bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
+                        <img src="/assets/transaction.png" alt="Transactions Icon" class="w-5 h-5 mr-3">
+                        Transactions
+                    </a>
+                </nav>
+            </div>
+            <button id="logoutBtn" class="text-gray-600 hover:bg-gray-100 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
+                <img src="/assets/logout.png" alt="Logout Icon" class="w-5 h-5 mr-3">
+                Logout
+            </button>
         </div>
     </aside>
 
@@ -179,8 +185,8 @@
         </div>
     </div>
 
- <script>
-    const userId = window.location.pathname.split('/').pop(); // Extract user ID from URL
+    <script>
+        const userId = window.location.pathname.split('/').pop(); // Extract user ID from URL
         
         const productsNavLink = $('aside a[href="/products"]');
         if (productsNavLink.length > 0 && userId) { //
@@ -192,240 +198,146 @@
             transactionsNavLink.attr('href', `/transactions/${userId}`);
         }
 
-    $(document).ready(function() {
-        function fetchTransactions() {
+        $('#logoutBtn').click(function() {
             $.ajax({
-                url: `/api/transactions/${userId}`,
-                type: 'GET',
-                dataType: 'json',
-                xhrFields: {
-                    withCredentials: true // Ensure cookies are sent with the request
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        let transactions = response.data;
-                        let tableBody = $('#transactionsTable').find('tbody');
-                        tableBody.empty();
-
-                        transactions.forEach(transaction => {
-                            tableBody.append(`
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${transaction.id}</td>
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${transaction.product.name}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${transaction.quantity}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700">${transaction.total_price}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <button data-id="${transaction.id}" class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 mr-2">Edit</button>
-                                        <button data-id="${transaction.id}" class="delete-btn bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">Delete</button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        showErrorModal('Failed to fetch transactions: ' + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error fetching transactions: ' + error);
-                }
-            });
-        }
-
-        function populateProductDropdown(dropdownId) {
-            $.ajax({
-                url: '/api/products-list',
-                type: 'GET',
-                dataType: 'json',
-                xhrFields: {
-                    withCredentials: true // Send cookies with the request
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        let products = response.data;
-                        let dropdown = $('#' + dropdownId);
-                        dropdown.empty().append('<option value="" disabled selected>Select a product</option>'); // Clear and add default option
-
-                        products.forEach(product => {
-                            dropdown.append(`
-                                <option value="${product.id}">${product.name}</option>
-                            `);
-                        });
-                    } else {
-                        showErrorModal('Failed to fetch products for dropdown: ' + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error fetching products for dropdown: ' + error);
-                }
-            });
-        }
-
-        // Add Transaction
-        $('#addTransactionBtn').click(function() {
-            $('#addTransactionModal').show();
-            populateProductDropdown('product_id'); // Populate dropdown when adding
-        });
-
-        $('#addTransactionModal .close').click(function() {
-            $('#addTransactionModal').hide();
-            $('#addTransactionForm')[0].reset();
-            $('.error-message').hide();
-        });
-
-        $('#addTransactionForm').submit(function(event) {
-            event.preventDefault();
-
-            let product_id = $('#product_id').val();
-            let quantity = $('#quantity').val();
-            let hasErrors = false;
-
-            $('.error-message').hide(); // Clear previous errors
-
-            if (product_id === null) {
-                $('#product-id-error').text('Please select a product').show();
-                hasErrors = true;
-            }
-            if (quantity === '' || quantity < 1) {
-                $('#quantity-error').text('Quantity is required and must be greater than 0').show();
-                hasErrors = true;
-            }
-
-            if (hasErrors) {
-                return;
-            }
-
-            $.ajax({
-                url: `/api/transactions`, // Include userId in the URL
+                url: '/api/logout', 
                 type: 'POST',
-                dataType: 'json',
-                data: {
-                    product_id: product_id,
-                    quantity: quantity
-                },
                 xhrFields: {
-                    withCredentials: true // Send cookies with the request
+                    withCredentials: true 
                 },
                 success: function(response) {
-                    if (response.status === 'success') {
-                        $('#addTransactionModal').hide();
-                        $('#addTransactionForm')[0].reset();
-                        fetchTransactions();
-                        showSuccessModal(response.message);
-                    } else {
-                        showErrorModal(response.message);
-                    }
+                    window.location.href = '/login'; 
                 },
                 error: function(xhr, status, error) {
-                    showErrorModal('Error adding transaction: ' + error);
+                    console.error('Logout failed:', error);
+                    showErrorModal('Logout failed. Please try again.');
                 }
             });
         });
 
-        // Edit Transaction
-        $(document).on('click', '.edit-btn', function() {
-            let id = $(this).data('id');
-            $.ajax({
-                url: `/api/transaction/${id}`, // Corrected URL for showing single transaction
-                type: 'GET',
-                dataType: 'json',
-                xhrFields: {
-                    withCredentials: true // Send cookies with the request
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        let transaction = response.data;
-                        $('#edit_id').val(transaction.id);
-                        $('#edit_quantity').val(transaction.quantity);
-
-                        // Populate the product dropdown in the edit modal
-                        populateProductDropdown('edit_product_id');
-
-                        // Set the selected product in the dropdown
-                        setTimeout(function() {
-                            $('#edit_product_id').val(transaction.product_id);
-                        }, 500); // Small delay to ensure dropdown is populated
-
-                        $('#editTransactionModal').show();
-                    } else {
-                        showErrorModal('Failed to retrieve transaction details.');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error fetching transaction details: ' + error);
-                }
-            });
-        });
-
-        $('#editTransactionModal .close').click(function() {
-            $('#editTransactionModal').hide();
-            $('#editTransactionForm')[0].reset();
-            $('.error-message').hide();
-        });
-
-        $('#editTransactionForm').submit(function(event) {
-            event.preventDefault();
-
-            let id = $('#edit_id').val();
-            let product_id = $('#edit_product_id').val();
-            let quantity = $('#edit_quantity').val();
-            let hasErrors = false;
-
-            $('.error-message').hide(); // Clear previous errors
-
-            if (product_id === null) {
-                $('#edit-product-id-error').text('Please select a product').show();
-                hasErrors = true;
-            }
-            if (quantity === '' || quantity < 1) {
-                $('#edit-quantity-error').text('Quantity is required and must be greater than 0').show();
-                hasErrors = true;
-            }
-
-            if (hasErrors) {
-                return;
-            }
-
-            $.ajax({
-                url: `/api/transactions/${id}`, // Include transaction id, you were missing this.
-                type: 'PUT',
-                dataType: 'json',
-                data: {
-                    product_id: product_id,
-                    quantity: quantity
-                },
-                xhrFields: {
-                    withCredentials: true // Send cookies with the request
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#editTransactionModal').hide();
-                        $('#editTransactionForm')[0].reset();
-                        fetchTransactions();
-                        showSuccessModal(response.message);
-                    } else {
-                        showErrorModal(response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error updating transaction: ' + error);
-                }
-            });
-        });
-
-
-        // Delete Transaction
-        $(document).on('click', '.delete-btn', function() {
-            let id = $(this).data('id');
-            if (confirm('Are you sure you want to delete this transaction?')) {
+        $(document).ready(function() {
+            function fetchTransactions() {
                 $.ajax({
-                    url: `/api/transactions/${id}`, // Include userId and transaction id
-                    type: 'DELETE',
+                    url: `/api/transactions/${userId}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    xhrFields: {
+                        withCredentials: true // Ensure cookies are sent with the request
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            let transactions = response.data;
+                            let tableBody = $('#transactionsTable').find('tbody');
+                            tableBody.empty();
+
+                            transactions.forEach(transaction => {
+                                tableBody.append(`
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${transaction.id}</td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${transaction.product.name}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${transaction.quantity}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700">${transaction.total_price}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button data-id="${transaction.id}" class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 mr-2">Edit</button>
+                                            <button data-id="${transaction.id}" class="delete-btn bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">Delete</button>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            showErrorModal('Failed to fetch transactions: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        if (xhr.status === 401) {
+                            window.location.href = '/login'; 
+                        } else if (xhr.status === 403) {
+                            showErrorModal('Forbidden - You do not have permission to view these products.');
+                        } else {
+                            showErrorModal('Error fetching products: ' + error);
+                        }
+                    }
+                });
+            }
+
+            function populateProductDropdown(dropdownId) {
+                $.ajax({
+                    url: '/api/products-list',
+                    type: 'GET',
                     dataType: 'json',
                     xhrFields: {
                         withCredentials: true // Send cookies with the request
                     },
                     success: function(response) {
                         if (response.status === 'success') {
+                            let products = response.data;
+                            let dropdown = $('#' + dropdownId);
+                            dropdown.empty().append('<option value="" disabled selected>Select a product</option>'); // Clear and add default option
+
+                            products.forEach(product => {
+                                dropdown.append(`
+                                    <option value="${product.id}">${product.name}</option>
+                                `);
+                            });
+                        } else {
+                            showErrorModal('Failed to fetch products for dropdown: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showErrorModal('Error fetching products for dropdown: ' + error);
+                    }
+                });
+            }
+
+            // Add Transaction
+            $('#addTransactionBtn').click(function() {
+                $('#addTransactionModal').show();
+                populateProductDropdown('product_id'); // Populate dropdown when adding
+            });
+
+            $('#addTransactionModal .close').click(function() {
+                $('#addTransactionModal').hide();
+                $('#addTransactionForm')[0].reset();
+                $('.error-message').hide();
+            });
+
+            $('#addTransactionForm').submit(function(event) {
+                event.preventDefault();
+
+                let product_id = $('#product_id').val();
+                let quantity = $('#quantity').val();
+                let hasErrors = false;
+
+                $('.error-message').hide(); // Clear previous errors
+
+                if (product_id === null) {
+                    $('#product-id-error').text('Please select a product').show();
+                    hasErrors = true;
+                }
+                if (quantity === '' || quantity < 1) {
+                    $('#quantity-error').text('Quantity is required and must be greater than 0').show();
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `/api/transactions`, // Include userId in the URL
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        product_id: product_id,
+                        quantity: quantity
+                    },
+                    xhrFields: {
+                        withCredentials: true // Send cookies with the request
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#addTransactionModal').hide();
+                            $('#addTransactionForm')[0].reset();
                             fetchTransactions();
                             showSuccessModal(response.message);
                         } else {
@@ -433,38 +345,155 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        showErrorModal('Error deleting transaction: ' + error);
+                        showErrorModal('Error adding transaction: ' + error);
                     }
                 });
+            });
+
+            // Edit Transaction
+            $(document).on('click', '.edit-btn', function() {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: `/api/transaction/${id}`, // Corrected URL for showing single transaction
+                    type: 'GET',
+                    dataType: 'json',
+                    xhrFields: {
+                        withCredentials: true // Send cookies with the request
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            let transaction = response.data;
+                            $('#edit_id').val(transaction.id);
+                            $('#edit_quantity').val(transaction.quantity);
+
+                            // Populate the product dropdown in the edit modal
+                            populateProductDropdown('edit_product_id');
+
+                            // Set the selected product in the dropdown
+                            setTimeout(function() {
+                                $('#edit_product_id').val(transaction.product_id);
+                            }, 500); // Small delay to ensure dropdown is populated
+
+                            $('#editTransactionModal').show();
+                        } else {
+                            showErrorModal('Failed to retrieve transaction details.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showErrorModal('Error fetching transaction details: ' + error);
+                    }
+                });
+            });
+
+            $('#editTransactionModal .close').click(function() {
+                $('#editTransactionModal').hide();
+                $('#editTransactionForm')[0].reset();
+                $('.error-message').hide();
+            });
+
+            $('#editTransactionForm').submit(function(event) {
+                event.preventDefault();
+
+                let id = $('#edit_id').val();
+                let product_id = $('#edit_product_id').val();
+                let quantity = $('#edit_quantity').val();
+                let hasErrors = false;
+
+                $('.error-message').hide(); // Clear previous errors
+
+                if (product_id === null) {
+                    $('#edit-product-id-error').text('Please select a product').show();
+                    hasErrors = true;
+                }
+                if (quantity === '' || quantity < 1) {
+                    $('#edit-quantity-error').text('Quantity is required and must be greater than 0').show();
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `/api/transactions/${id}`, // Include transaction id, you were missing this.
+                    type: 'PUT',
+                    dataType: 'json',
+                    data: {
+                        product_id: product_id,
+                        quantity: quantity
+                    },
+                    xhrFields: {
+                        withCredentials: true // Send cookies with the request
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#editTransactionModal').hide();
+                            $('#editTransactionForm')[0].reset();
+                            fetchTransactions();
+                            showSuccessModal(response.message);
+                        } else {
+                            showErrorModal(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showErrorModal('Error updating transaction: ' + error);
+                    }
+                });
+            });
+
+
+            // Delete Transaction
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this transaction?')) {
+                    $.ajax({
+                        url: `/api/transactions/${id}`, // Include userId and transaction id
+                        type: 'DELETE',
+                        dataType: 'json',
+                        xhrFields: {
+                            withCredentials: true // Send cookies with the request
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                fetchTransactions();
+                                showSuccessModal(response.message);
+                            } else {
+                                showErrorModal(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            showErrorModal('Error deleting transaction: ' + error);
+                        }
+                    });
+                }
+            });
+
+            // Generic error modal display function
+            function showErrorModal(message) {
+                $('#error-message').text(message);
+                $('#errorModal').show();
             }
-        });
 
-        // Generic error modal display function
-        function showErrorModal(message) {
-            $('#error-message').text(message);
-            $('#errorModal').show();
-        }
-
-        // Generic success modal display function
-        function showSuccessModal(message) {
-            $('#success-message').text(message);
-            $('#successModal').show();
-        }
-
-        // Close modals
-        $('.modal .close').click(function() {
-            $(this).closest('.modal').hide();
-        });
-
-        $(window).click(function(event) {
-            if ($(event.target).hasClass('modal')) {
-                $('.modal').hide();
+            // Generic success modal display function
+            function showSuccessModal(message) {
+                $('#success-message').text(message);
+                $('#successModal').show();
             }
-        });
 
-        // Initial fetch of transactions
-        fetchTransactions();
-    });
-</script>
+            // Close modals
+            $('.modal .close').click(function() {
+                $(this).closest('.modal').hide();
+            });
+
+            $(window).click(function(event) {
+                if ($(event.target).hasClass('modal')) {
+                    $('.modal').hide();
+                }
+            });
+
+            // Initial fetch of transactions
+            fetchTransactions();
+        });
+    </script>
 </body>
 </html>

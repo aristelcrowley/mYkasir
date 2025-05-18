@@ -46,16 +46,4 @@ class LoginController extends Controller
             'success' => "User login successfully",
         ], 200)->withCookie($cookie);
     }
-
-    /**
-     * Log the user out.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout(Request $request)
-    {
-        $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Logged out']);
-    }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
@@ -10,9 +11,10 @@ use App\Http\Middleware\AuthToken;
 
 Route::post('/login', [LoginController::class, 'login'])->withoutMiddleware(AuthToken::class);
 Route::post('/signup', [RegisterController::class, 'register'])->withoutMiddleware(AuthToken::class);
-Route::post('/logout', [LoginController::class, 'logout']);
 
 Route::middleware(AuthToken::class)->group(function () {
+    Route::post('/logout', [LogoutController::class, 'logout']);
+
     Route::get('/products/{userId}', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/product/{productId}', [ProductController::class, 'show']);

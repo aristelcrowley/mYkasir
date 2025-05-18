@@ -20,19 +20,25 @@
     </style>
 </head>
 <body class="bg-gray-50 antialiased h-screen flex overflow-hidden">
-    <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200">
-        <div class="p-6">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-8">mYkasir</h2>
-            <nav class="flex flex-col space-y-2">
-                <a href="/products" class="bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
-                    <img src="/assets/product.png" alt="Products Icon" class="w-5 h-5 mr-3">
-                    Products
-                </a>
-                <a href="/transactions" class="text-gray-600 hover:bg-gray-100 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
-                    <img src="/assets/transaction.png" alt="Transactions Icon" class="w-5 h-5 mr-3">
-                    Transactions
-                </a>
-            </nav>
+    <aside class="bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col h-screen">
+        <div class="p-6 flex flex-col justify-between h-full">
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-8">mYkasir</h2>
+                <nav class="flex flex-col space-y-2">
+                    <a href="/products" class="bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
+                        <img src="/assets/product.png" alt="Products Icon" class="w-5 h-5 mr-3">
+                        Products
+                    </a>
+                    <a href="/transactions" class="text-gray-600 hover:bg-gray-100 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
+                        <img src="/assets/transaction.png" alt="Transactions Icon" class="w-5 h-5 mr-3">
+                        Transactions
+                    </a>
+                </nav>
+            </div>
+            <button id="logoutBtn" class="text-gray-600 hover:bg-gray-100 rounded-lg py-3 px-4 font-medium transition duration-150 ease-in-out flex items-center">
+                <img src="/assets/logout.png" alt="Logout Icon" class="w-5 h-5 mr-3">
+                Logout
+            </button>
         </div>
     </aside>
 
@@ -203,6 +209,23 @@
         if (transactionsNavLink.length > 0 && userId) { 
             transactionsNavLink.attr('href', `/transactions/${userId}`);
         }
+
+        $('#logoutBtn').click(function() {
+            $.ajax({
+                url: '/api/logout', 
+                type: 'POST',
+                xhrFields: {
+                    withCredentials: true 
+                },
+                success: function(response) {
+                    window.location.href = '/login'; 
+                },
+                error: function(xhr, status, error) {
+                    console.error('Logout failed:', error);
+                    showErrorModal('Logout failed. Please try again.');
+                }
+            });
+        });
 
         function ajaxRequest(url, type, data = null) {
             return $.ajax({
