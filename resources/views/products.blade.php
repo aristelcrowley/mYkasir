@@ -191,11 +191,19 @@
     </div>
 
     <script>
-$(document).ready(function() {
+    $(document).ready(function() {
         const userId = window.location.pathname.split('/').pop(); // Extract user ID from URL
-        console.log("User ID:", userId); // Check the extracted user ID
+        
+        const productsNavLink = $('aside a[href="/products"]');
+        if (productsNavLink.length > 0 && userId) { //
+            productsNavLink.attr('href', `/products/${userId}`);
+        }
 
-        // Function to perform AJAX requests with the// auth_token cookie
+        const transactionsNavLink = $('aside a[href="/transactions"]');
+        if (transactionsNavLink.length > 0 && userId) { 
+            transactionsNavLink.attr('href', `/transactions/${userId}`);
+        }
+
         function ajaxRequest(url, type, data = null) {
             return $.ajax({
                 url: url,
