@@ -187,40 +187,52 @@
 
     <script>
     $(document).ready(function() {
+        const userId = window.location.pathname.split('/').pop(); // Extract user ID from URL
+
+        // Function to perform AJAX requests with the// auth_token cookie
+        function ajaxRequest(url, type, data = null) {
+            return $.ajax({
+                url: url,
+                type: type,
+                dataType: 'json',
+                data: data,
+                xhrFields: {
+                    withCredentials: true // Ensure cookies are sent with the request
+                },
+            });
+        }
+
         // Fetch and display products
         function fetchProducts() {
-            $.ajax({
-                url: '/api/products',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        let products = response.data;
-                        let tableBody = $('#productsTable').find('tbody');
-                        tableBody.empty(); // Clear loading message and any existing data
+            ajaxRequest(`/api/products/${userId}`, 'GET')
+                .done(function(products) {
+                    let tableBody = $('#productsTable').find('tbody');
+                    tableBody.empty(); // Clear loading message and any existing data
 
-                        products.forEach(product => {
-                            tableBody.append(`
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${product.id}</td>
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${product.name}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700">${product.price}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${product.stock}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <button data-id="${product.id}" class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 mr-2">Edit</button>
-                                        <button data-id="${product.id}" class="delete-btn bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">Delete</button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
+                    products.forEach(product => {
+                        tableBody.append(`
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${product.id}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">${product.name}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700">${product.price}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${product.stock}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button data-id="${product.id}" class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 mr-2">Edit</button>
+                                    <button data-id="${product.id}" class="delete-btn bg-red-500 hover:bg-red-600 text-white font-medium py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">Delete</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                })
+                .fail(function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        window.location.href = '/login'; // Redirect to login on unauthorized
+                    } else if (xhr.status === 403) {
+                        showErrorModal('Forbidden - You do not have permission to view these products.');
                     } else {
-                        showErrorModal('Failed to fetch products: ' + response.message);
+                        showErrorModal('Error fetching products: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error fetching products: ' + error);
-                }
-            });
+                });
         }
 
         // Add Product
@@ -251,15 +263,15 @@
             if (price === '') {
                 $('#price-error').text('Price is required').show();
                 hasErrors = true;
-            }   else if (price < 0) {
-                $('#price-error').text('Price must be greater than or equal to 0').show();
+            }   else if (isNaN(price) || parseFloat(price) < 0) {
+                $('#price-error').text('Price must be a number greater than or equal to 0').show();
                 hasErrors = true;
             }
             if (stock === '') {
                 $('#stock-error').text('Stock is required').show();
                 hasErrors = true;
-            } else if (stock < 0) {
-                $('#stock-error').text('Stock must be greater than or equal to 0').show();
+            } else if (isNaN(stock) || parseInt(stock) < 0) {
+                $('#stock-error').text('Stock must be an integer greater than or equal to 0').show();
                 hasErrors = true;
             }
 
@@ -267,54 +279,51 @@
                 return;
             }
 
-            $.ajax({
-                url: '/api/products',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    name: name,
-                    price: price,
-                    stock: stock
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#addProductModal').hide();
-                        $('#addProductForm')[0].reset();
-                        fetchProducts();
-                        showSuccessModal(response.message);
-                    } else {
-                        showErrorModal(response.message);
+            ajaxRequest(`/api/products/${userId}`, 'POST', { name: name, price: price, stock: stock })
+                .done(function(response) {
+                    $('#addProductModal').hide();
+                    $('#addProductForm')[0].reset();
+                    fetchProducts();
+                    showSuccessModal('Product added successfully!');
+                })
+                .fail(function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        window.location.href = '/login'; // Redirect to login on unauthorized
+                    } else if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        let errorMessage = 'Validation error: ';
+                        $.each(errors, function(key, value) {
+                            errorMessage += value[0] + ' ';
+                            $('#' + key + '-error').text(value[0]).show();
+                        });
+                        showErrorModal(errorMessage);
                     }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error adding product: ' + error);
-                }
-            });
+                     else {
+                        showErrorModal('Error adding product: ' + error);
+                    }
+                });
         });
 
         // Edit Product
         $(document).on('click', '.edit-btn', function() {
             let id = $(this).data('id');
-            $.ajax({
-                url: '/api/products/' + id,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        let product = response.data;
-                        $('#edit_id').val(product.id);
-                        $('#edit_name').val(product.name);
-                        $('#edit_price').val(product.price);
-                        $('#edit_stock').val(product.stock);
-                        $('#editProductModal').show();
+            ajaxRequest(`/api/products/${userId}/${id}`, 'GET')
+                .done(function(product) {
+                    $('#edit_id').val(product.id);
+                    $('#edit_name').val(product.name);
+                    $('#edit_price').val(product.price);
+                    $('#edit_stock').val(product.stock);
+                    $('#editProductModal').show();
+                })
+                .fail(function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        window.location.href = '/login'; // Redirect to login on unauthorized
+                    } else if (xhr.status === 403) {
+                        showErrorModal('Forbidden - You do not have permission to edit this product.');
                     } else {
-                        showErrorModal('Failed to retrieve product details.');
+                        showErrorModal('Error fetching product details: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error fetching product details: ' + error);
-                }
-            });
+                });
         });
 
         $('#editProductModal .close').click(function() {
@@ -341,15 +350,15 @@
             if (price === '') {
                 $('#edit-price-error').text('Price is required').show();
                 hasErrors = true;
-            } else if (price < 0) {
-                $('#edit-price-error').text('Price must be greater than or equal to 0').show();
+            } else if (isNaN(price) || parseFloat(price) < 0) {
+                $('#edit-price-error').text('Price must be a number greater than or equal to 0').show();
                 hasErrors = true;
             }
             if (stock === '') {
                 $('#edit-stock-error').text('Stock isrequired').show();
                 hasErrors = true;
-            } else if (stock < 0) {
-                $('#edit-stock-error').text('Stock must be greater than or equal to 0').show();
+            } else if (isNaN(stock) || parseInt(stock) < 0) {
+                $('#edit-stock-error').text('Stock must be an integer greater than or equal to 0').show();
                 hasErrors = true;
             }
 
@@ -357,51 +366,50 @@
                 return;
             }
 
-            $.ajax({
-                url: '/api/products/' + id,
-                type: 'PUT',
-                dataType: 'json',
-                data: {
-                    name: name,
-                    price: price,
-                    stock: stock
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#editProductModal').hide();
-                        $('#editProductForm')[0].reset();
-                        fetchProducts();
-                        showSuccessModal(response.message);
+            ajaxRequest(`/api/products/${userId}/${id}`, 'PUT', { name: name, price: price, stock: stock })
+                .done(function(response) {
+                    $('#editProductModal').hide();
+                    $('#editProductForm')[0].reset();
+                    fetchProducts();
+                    showSuccessModal('Product updated successfully!');
+                })
+                .fail(function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        window.location.href = '/login'; // Redirect to login on unauthorized
+                    } else if (xhr.status === 403) {
+                        showErrorModal('Forbidden - You do not have permission to edit this product.');
+                    } else if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        let errorMessage = 'Validation error: ';
+                        $.each(errors, function(key, value) {
+                            errorMessage += value[0] + ' ';
+                            $('#edit-' + key + '-error').text(value[0]).show();
+                        });
+                        showErrorModal(errorMessage);
                     } else {
-                        showErrorModal(response.message);
+                        showErrorModal('Error updating product: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    showErrorModal('Error updating product: ' + error);
-                }
-            });
+                });
         });
 
         // Delete Product
         $(document).on('click', '.delete-btn', function() {
             let id = $(this).data('id');
             if (confirm('Are you sure you want to delete this product?')) {
-                $.ajax({
-                    url: '/api/products/' + id,
-                    type: 'DELETE',
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            fetchProducts();
-                            showSuccessModal(response.message);
+                ajaxRequest(`/api/products/${userId}/${id}`, 'DELETE')
+                    .done(function(response) {
+                        fetchProducts();
+                        showSuccessModal('Product deleted successfully!');
+                    })
+                    .fail(function(xhr, status, error) {
+                        if (xhr.status === 401) {
+                            window.location.href = '/login'; // Redirect to login on unauthorized
+                        } else if (xhr.status === 403) {
+                            showErrorModal('Forbidden - You do not have permission to delete this product.');
                         } else {
-                            showErrorModal(response.message);
+                            showErrorModal('Error deleting product: ' + error);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        showErrorModal('Error deleting product: ' + error);
-                    }
-                });
+                    });
             }
         });
 

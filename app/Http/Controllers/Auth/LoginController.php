@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -18,21 +17,34 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $credentials = $request->only('email', 'password');
 
-        $user = User::where('email', $email)->first();
-
-        if ($user && Hash::check($password, $user->password)) {
-            // Authentication successful
-            $token = $user->createToken('auth_token')->plainTextToken;
-            // Set the token as a cookie
-            cookie('auth_token', $token, 60 * 24); // 24 hours
-            return response()->json(['token' => $token, 'user_id' => $user->id], 200);
-        } else {
-            // Authentication failed
-            return response()->json(['message' => 'Invalid credentials'], 401);
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
+
+        $user = User::where('email', $request->email)->first();
+
+        $user->tokens()->delete();
+
+        $token = $user->createToken('token')->plainTextToken;
+
+        $cookie = cookie(
+            'auth_token', 
+            $token,     
+            60 * 24 * 1, 
+            null,         
+            null,       
+            true,         
+            true,         
+            false,       
+            'Strict'     
+        );
+
+        return response()->json([
+            'user' => $user,
+            'success' => "User login successfully",
+        ], 200)->withCookie($cookie);
     }
 
     /**
@@ -43,15 +55,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        $tokenValue = $request->cookie('auth_token');
-
-        if ($tokenValue) {
-            $accessToken = PersonalAccessToken::findToken($tokenValue);
-            if ($accessToken) {
-                $accessToken->delete();
-            }
-        }
-        // Clear the cookie by returning a response that removes it
-        return response()->json(['message' => 'Logged out'])->withoutCookie('auth_token');
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'Logged out']);
     }
 }

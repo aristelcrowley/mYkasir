@@ -35,59 +35,61 @@
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#login-form').submit(function(event) {
-                event.preventDefault();
-                $('#email-error').hide();
-                $('#password-error').hide();
+        $(document).ready(function() {
+            $('#login-form').submit(function(event) {
+                event.preventDefault();
+                $('#email-error').hide();
+                $('#password-error').hide();
 
-                var email = $('#email').val().trim();
-                var password = $('#password').val().trim();
-                var hasErrors = false;
+                var email = $('#email').val().trim();
+                var password = $('#password').val().trim();
+                var hasErrors = false;
 
-                if (!email) {
-                    $('#email-error').text('Email is required').show();
-                    hasErrors = true;
-                } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-                    $('#email-error').text('Invalid email format').show();
-                    hasErrors = true;
-                }
+                if (!email) {
+                    $('#email-error').text('Email is required').show();
+                    hasErrors = true;
+                } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+                    $('#email-error').text('Invalid email format').show();
+                    hasErrors = true;
+                }
 
-                if (!password) {
-                    $('#password-error').text('Password is required').show();
-                    hasErrors = true;
-                }
+                if (!password) {
+                    $('#password-error').text('Password is required').show();
+                    hasErrors = true;
+                }
 
-                if (hasErrors) {
-                    return;
-                }
+                if (hasErrors) {
+                    return;
+                }
 
-                $.ajax({
-                    url: '/api/login',
-                    type: 'POST',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ email: email, password: password }),
-                    success: function(data) {
-                        if (data.token) {
-                            document.cookie = `auth_token=${data.token}; path=/; max-age=86400`; // 24 hours
-                            window.location.href = '/products/' + data.user_id;
-                        } else {
-                            alert(data.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                        var response = xhr.responseJSON;
-                        if (response && response.message) {
-                            alert(response.message);
-                        } else {
-                            alert('An error occurred during login.');
-                        }
-                    }
-                });
-            });
-        });
-    </script>
+                $.ajax({
+                    url: '/api/login',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: email, password: password }),
+                    success: function(data) {
+                        if (data.success) { 
+                            window.location.href = '/products/' + data.user.id; 
+                        } else if (data.message) {
+                            alert(data.message);
+                        } else {
+                            alert('Login successful!'); 
+                            window.location.href = '/products/' + data.user.id;
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        var response = xhr.responseJSON;
+                        if (response && response.message) {
+                            alert(response.message);
+                        } else {
+                            alert('An error occurred during login.');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
