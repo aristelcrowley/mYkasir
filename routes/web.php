@@ -8,8 +8,8 @@ Route::get('/', function () {
 Route::get('/login', function () {
     return view('login');
 });
-Route::get('/signup', function () {
-    return view('signup');
+Route::get('/register', function () {
+    return view('register');
 });
 Route::get('/products/{user_id}', function ($user_id) {
     return view('products');
